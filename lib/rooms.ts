@@ -56,7 +56,9 @@ export async function createRoom(): Promise<{ roomId: string; hostKey: string }>
 
 export async function getHostKey(roomId: string): Promise<string | null> {
   const redis = await getRedis();
-  return (await redis.hGet(kMeta(roomId), "hostKey")) ?? null;
+  const v = await redis.hGet(kMeta(roomId), "hostKey");
+  if (v == null) return null;
+  return (typeof v === "string" ? v : v.toString("utf8"));
 }
 
 export async function requireHost(roomId: string, hostKey: string | null) {
@@ -66,19 +68,22 @@ export async function requireHost(roomId: string, hostKey: string | null) {
 
 export async function getRoom(roomId: string): Promise<Room | null> {
   const redis = await getRedis();
-  const meta = await redis.hGetAll(kMeta(roomId));
+  const metaRaw = await redis.hGetAll(kMeta(roomId));
+  const meta = metaRaw as unknown as Record<string, string | Buffer>;
   if (!meta || Object.keys(meta).length === 0) return null;
 
-  const createdAt = Number(meta.createdAt || 0);
-  const mode = (meta.mode === "shuffle" ? "shuffle" : "voted") as "voted" | "shuffle";
+  const createdAt = Number((typeof meta.createdAt === "string" ? meta.createdAt : (meta.createdAt ? meta.createdAt.toString("utf8") : "0")) || 0);
+  const modeStr = typeof meta.mode === "string" ? meta.mode : (meta.mode ? meta.mode.toString("utf8") : "voted");
+  const mode = (modeStr === "shuffle" ? "shuffle" : "voted") as "voted" | "shuffle";
 
   let nowPlaying: Track | undefined = undefined;
-  const np = meta.nowPlayingJson || "";
+  const np = (typeof meta.nowPlayingJson === "string" ? meta.nowPlayingJson : (meta.nowPlayingJson ? meta.nowPlayingJson.toString("utf8") : "")) || "";
   if (np) {
     try { nowPlaying = JSON.parse(np) as Track; } catch { nowPlaying = undefined; }
   }
 
-  const trackIds = await redis.sMembers(kQueue(roomId));
+  const trackIdsRaw = await redis.sMembers(kQueue(roomId));
+  const trackIds = (Array.isArray(trackIdsRaw) ? trackIdsRaw : Array.from(trackIdsRaw as any)).map((x: any) => typeof x === "string" ? x : x.toString("utf8")) as string[];
   if (trackIds.length === 0) return { id: roomId, createdAt, mode, queue: [], nowPlaying };
 
   const pipe = redis.multi();
