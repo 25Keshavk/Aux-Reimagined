@@ -1,21 +1,24 @@
-import { createClient } from "redis";
+import { createClient, type RedisClientType } from "redis";
 
-type GlobalWithRedis = typeof globalThis & { __redisClient?: ReturnType<typeof createClient> };
+let client: RedisClientType | null = null;
 
-export async function getRedis() {
+export async function getRedis(): Promise<RedisClientType> {
+  if (client) return client;
+
   const url = process.env.REDIS_URL;
-  if (!url) throw new Error("Missing env var: REDIS_URL");
+  if (!url) throw new Error("Missing REDIS_URL");
 
-  const g = globalThis as GlobalWithRedis;
+  const isTls = url.startsWith("rediss://");
 
-  if (!g.__redisClient) {
-    g.__redisClient = createClient({ url });
-    g.__redisClient.on("error", (err) => console.error("Redis error:", err));
-  }
+  client = createClient({
+    url,
+    socket: isTls ? { tls: true } : undefined,
+  });
 
-  if (!g.__redisClient.isOpen) {
-    await g.__redisClient.connect();
-  }
+  client.on("error", (err) => {
+    console.error("Redis Client Error", err);
+  });
 
-  return g.__redisClient;
+  await client.connect();
+  return client;
 }
