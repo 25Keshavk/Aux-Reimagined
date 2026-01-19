@@ -107,7 +107,8 @@ export async function getRoom(roomId: string): Promise<Room | null> {
     if (!json) continue;
 
     try {
-      const base = JSON.parse(json) as Omit<Track, "votes" | "addedAt">;
+      const jsonStr = typeof json === "string" ? json : (json as any).toString("utf8");
+      const base = JSON.parse(jsonStr) as Omit<Track, "votes" | "addedAt">;
       queue.push({
         ...base,
         votes: up - down,
@@ -202,21 +203,26 @@ export async function nextTrack(roomId: string, hostKey: string | null): Promise
     const tid = await redis.sRandMember(kQueue(roomId));
     if (!tid) return { room, next: null };
 
-    const json = await redis.hGet(kTracks(roomId), tid);
-    const addedAtStr = await redis.hGet(kAdded(roomId), tid);
-    const up = await redis.sCard(kUp(roomId, tid));
-    const down = await redis.sCard(kDown(roomId, tid));
+    const tidStr = typeof tid === "string" ? tid : (tid as any).toString("utf8");
+
+    const json = await redis.hGet(kTracks(roomId), tidStr);
+    const addedAtStr = await redis.hGet(kAdded(roomId), tidStr);
+    const upRaw = await redis.sCard(kUp(roomId, tidStr));
+    const up = typeof upRaw === "string" ? parseInt(upRaw, 10) : Number(upRaw);
+    const downRaw = await redis.sCard(kDown(roomId, tidStr));
+    const down = typeof downRaw === "string" ? parseInt(downRaw, 10) : Number(downRaw);
 
     if (json) {
       try {
-        const base = JSON.parse(json) as Omit<Track, "votes" | "addedAt">;
+        const jsonStr = typeof json === "string" ? json : (json as any).toString("utf8");
+        const base = JSON.parse(jsonStr) as Omit<Track, "votes" | "addedAt">;
         next = { ...base, votes: up - down, addedAt: Number(addedAtStr ?? Date.now()) };
       } catch {
         next = null;
       }
     }
 
-    await redis.sRem(kQueue(roomId), tid);
+    await redis.sRem(kQueue(roomId), tidStr);
   } else {
     next = room.queue[0];
     await redis.sRem(kQueue(roomId), next.id);
