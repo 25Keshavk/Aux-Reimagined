@@ -1,0 +1,378 @@
+"use client";
+
+import { use, useEffect, useMemo, useState } from "react";
+import Script from "next/script";
+
+type Track = {
+  id: string;
+  name: string;
+  artist: string;
+  artworkUrl?: string;
+  votes: number;
+  addedAt: number;
+};
+
+type Room = {
+  id: string;
+  createdAt: number;
+  queue: Track[];
+  nowPlaying?: Track;
+};
+
+declare global {
+  interface Window {
+    MusicKit?: any;
+  }
+}
+
+export default function RoomPage(props: { params: Promise<{ roomId: string }> }) {
+  const { roomId: raw } = use(props.params);
+  const roomId = useMemo(() => (raw ?? "").toUpperCase(), [raw]);
+
+  const [room, setRoom] = useState<Room | null>(null);
+  const [q, setQ] = useState("");
+  const [results, setResults] = useState<any[]>([]);
+  const [mkReady, setMkReady] = useState(false);
+
+  async function refresh() {
+    if (!roomId) return;
+    const res = await fetch(`/api/rooms/${roomId}`, { cache: "no-store" });
+    if (res.ok) setRoom(await res.json());
+  }
+
+  useEffect(() => {
+    refresh();
+    const t = setInterval(refresh, 1500);
+    return () => clearInterval(t);
+  }, [roomId]);
+
+  async function configureMusicKit() {
+    const res = await fetch("/api/apple-music/developer-token", { cache: "no-store" });
+    const { token: developerToken } = await res.json();
+
+    await window.MusicKit.configure({
+      developerToken,
+      app: { name: "Aux Reimagined", build: "1.0.0" },
+    });
+
+    setMkReady(true);
+  }
+
+  async function connectAppleMusic() {
+    const music = window.MusicKit.getInstance();
+    await music.authorize();
+  }
+
+  async function search() {
+    const term = q.trim();
+    if (!term) return;
+    const res = await fetch(`/api/apple-music/search?q=${encodeURIComponent(term)}&storefront=us`, {
+      cache: "no-store",
+    });
+    const json = await res.json();
+    const songs = json?.results?.songs?.data ?? [];
+    setResults(songs);
+  }
+
+  async function addSong(item: any) {
+    const attr = item.attributes;
+    const artwork = attr?.artwork?.url
+      ? attr.artwork.url.replace("{w}", "128").replace("{h}", "128")
+      : undefined;
+
+    await fetch(`/api/rooms/${roomId}/add`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: item.id,
+        name: attr?.name ?? "Unknown",
+        artist: attr?.artistName ?? "Unknown",
+        artworkUrl: artwork,
+      }),
+    });
+
+    await refresh();
+  }
+
+  async function vote(trackId: string, delta: 1 | -1) {
+    await fetch(`/api/rooms/${roomId}/vote`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ trackId, delta }),
+    });
+    await refresh();
+  }
+
+  async function playNext() {
+    const res = await fetch(`/api/rooms/${roomId}/next`, { method: "POST" });
+    const json = await res.json();
+    if (json?.room) setRoom(json.room);
+
+    const next = json?.next as Track | null;
+    if (!next) {
+      alert("Queue is empty.");
+      return;
+    }
+
+    try {
+      const music = window.MusicKit.getInstance();
+      await music.setQueue({ song: next.id });
+      await music.play();
+    } catch (e) {
+      console.error(e);
+      alert("Playback failed. Click 'Connect Apple Music' first.");
+    }
+  }
+
+  return (
+    <main style={{ padding: 24, maxWidth: 900 }}>
+      <Script
+        src="https://js-cdn.music.apple.com/musickit/v1/musickit.js"
+        strategy="afterInteractive"
+        onLoad={() => configureMusicKit()}
+      />
+
+      <h2>Room: {roomId}</h2>
+
+      <div style={{ display: "flex", gap: 10, margin: "12px 0" }}>
+        <button disabled={!mkReady} onClick={connectAppleMusic}>
+          Connect Apple Music
+        </button>
+        <button onClick={playNext}>Play next</button>
+      </div>
+
+      <div style={{ display: "flex", gap: 10, margin: "12px 0" }}>
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Search songs..."
+          style={{ flex: 1 }}
+        />
+        <button onClick={search}>Search</button>
+      </div>
+
+      <div style={{ display: "grid", gap: 8, marginBottom: 20 }}>
+        {results.map((item) => (
+          <div key={item.id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {item.attributes?.artwork?.url ? (
+              <img
+                src={item.attributes.artwork.url.replace("{w}", "64").replace("{h}", "64")}
+                width={48}
+                height={48}
+                alt=""
+              />
+            ) : null}
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 600 }}>{item.attributes?.name}</div>
+              <div style={{ opacity: 0.7 }}>{item.attributes?.artistName}</div>
+            </div>
+            <button onClick={() => addSong(item)}>Add</button>
+          </div>
+        ))}
+
+cd ~/Desktop/aux-reimagined
+
+cat > "app/room/[roomId]/page.tsx" <<'EOF'
+"use client";
+
+import { use, useEffect, useMemo, useState } from "react";
+import Script from "next/script";
+
+type Track = {
+  id: string;
+  name: string;
+  artist: string;
+  artworkUrl?: string;
+  votes: number;
+  addedAt: number;
+};
+
+type Room = {
+  id: string;
+  createdAt: number;
+  queue: Track[];
+  nowPlaying?: Track;
+};
+
+declare global {
+  interface Window {
+    MusicKit?: any;
+  }
+}
+
+export default function RoomPage(props: { params: Promise<{ roomId: string }> }) {
+  const { roomId: raw } = use(props.params);
+  const roomId = useMemo(() => (raw ?? "").toUpperCase(), [raw]);
+
+  const [room, setRoom] = useState<Room | null>(null);
+  const [q, setQ] = useState("");
+  const [results, setResults] = useState<any[]>([]);
+  const [mkReady, setMkReady] = useState(false);
+
+  async function refresh() {
+    if (!roomId) return;
+    const res = await fetch(`/api/rooms/${roomId}`, { cache: "no-store" });
+    if (res.ok) setRoom(await res.json());
+  }
+
+  useEffect(() => {
+    refresh();
+    const t = setInterval(refresh, 1500);
+    return () => clearInterval(t);
+  }, [roomId]);
+
+  async function configureMusicKit() {
+    const res = await fetch("/api/apple-music/developer-token", { cache: "no-store" });
+    const { token: developerToken } = await res.json();
+
+    await window.MusicKit.configure({
+      developerToken,
+      app: { name: "Aux Reimagined", build: "1.0.0" },
+    });
+
+    setMkReady(true);
+  }
+
+  async function connectAppleMusic() {
+    const music = window.MusicKit.getInstance();
+    await music.authorize();
+  }
+
+  async function search() {
+    const term = q.trim();
+    if (!term) return;
+    const res = await fetch(`/api/apple-music/search?q=${encodeURIComponent(term)}&storefront=us`, {
+      cache: "no-store",
+    });
+    const json = await res.json();
+    const songs = json?.results?.songs?.data ?? [];
+    setResults(songs);
+  }
+
+  async function addSong(item: any) {
+    const attr = item.attributes;
+    const artwork = attr?.artwork?.url
+      ? attr.artwork.url.replace("{w}", "128").replace("{h}", "128")
+      : undefined;
+
+    await fetch(`/api/rooms/${roomId}/add`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: item.id,
+        name: attr?.name ?? "Unknown",
+        artist: attr?.artistName ?? "Unknown",
+        artworkUrl: artwork,
+      }),
+    });
+
+    await refresh();
+  }
+
+  async function vote(trackId: string, delta: 1 | -1) {
+    await fetch(`/api/rooms/${roomId}/vote`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ trackId, delta }),
+    });
+    await refresh();
+  }
+
+  async function playNext() {
+    const res = await fetch(`/api/rooms/${roomId}/next`, { method: "POST" });
+    const json = await res.json();
+    if (json?.room) setRoom(json.room);
+
+    const next = json?.next as Track | null;
+    if (!next) {
+      alert("Queue is empty.");
+      return;
+    }
+
+    try {
+      const music = window.MusicKit.getInstance();
+      await music.setQueue({ song: next.id });
+      await music.play();
+    } catch (e) {
+      console.error(e);
+      alert("Playback failed. Click 'Connect Apple Music' first.");
+    }
+  }
+
+  return (
+    <main style={{ padding: 24, maxWidth: 900 }}>
+      <Script
+        src="https://js-cdn.music.apple.com/musickit/v1/musickit.js"
+        strategy="afterInteractive"
+        onLoad={() => configureMusicKit()}
+      />
+
+      <h2>Room: {roomId}</h2>
+
+      <div style={{ display: "flex", gap: 10, margin: "12px 0" }}>
+        <button disabled={!mkReady} onClick={connectAppleMusic}>
+          Connect Apple Music
+        </button>
+        <button onClick={playNext}>Play next</button>
+      </div>
+
+      <div style={{ display: "flex", gap: 10, margin: "12px 0" }}>
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Search songs..."
+          style={{ flex: 1 }}
+        />
+        <button onClick={search}>Search</button>
+      </div>
+
+      <div style={{ display: "grid", gap: 8, marginBottom: 20 }}>
+        {results.map((item) => (
+          <div key={item.id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {item.attributes?.artwork?.url ? (
+              <img
+                src={item.attributes.artwork.url.replace("{w}", "64").replace("{h}", "64")}
+                width={48}
+                height={48}
+                alt=""
+              />
+            ) : null}
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 600 }}>{item.attributes?.name}</div>
+              <div style={{ opacity: 0.7 }}>{item.attributes?.artistName}</div>
+            </div>
+            <button onClick={() => addSong(item)}>Add</button>
+          </div>
+        ))}
+      </div>
+
+      <h3>Now playing</h3>
+      <div style={{ marginBottom: 16 }}>
+        {room?.nowPlaying ? (
+          <div>
+            <b>{room.nowPlaying.name}</b> — {room.nowPlaying.artist}
+          </div>
+        ) : (
+          <div style={{ opacity: 0.7 }}>Nothing yet</div>
+        )}
+      </div>
+
+      <h3>Queue</h3>
+      <div style={{ display: "grid", gap: 8 }}>
+        {(room?.queue ?? []).map((t) => (
+          <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {t.artworkUrl ? <img src={t.artworkUrl} width={48} height={48} alt="" /> : null}
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 600 }}>{t.name}</div>
+              <div style={{ opacity: 0.7 }}>{t.artist}</div>
+            </div>
+            <div style={{ width: 40, textAlign: "center" }}>{t.votes}</div>
+            <button onClick={() => vote(t.id, 1)}>+1</button>
+            <button onClick={() => vote(t.id, -1)}>-1</button>
+          </div>
+        ))}
+        {room && room.queue.length === 0 ? <div style={{ opacity: 0.7 }}>Queue is empty</div> : null}
+      </div>
+    </main>
+  );
+}

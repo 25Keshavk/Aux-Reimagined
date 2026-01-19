@@ -1,0 +1,22 @@
+{
+  "name": "aux-reimagined",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "jose": "^6.1.3",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "redis": "^5.10.0"
+  },
+  "devDependencies": {
+    "@types/node": "25.0.9",
+    "@types/react": "19.2.8",
+    "typescript": "5.9.3"
+  }
+}

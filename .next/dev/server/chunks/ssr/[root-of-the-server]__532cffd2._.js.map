@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 10, "column": 0}, "map": {"version":3,"sources":["file:///Users/keshuk/Desktop/Aux-Reimagined/app/page.tsx"],"sourcesContent":["import { AppleMusicAuthButton } from \"@/components/AppleMusicAuthButton\";\n\nexport default function Home() {\n  return (\n    <main style={{ padding: 24 }}>\n      <h1>Aux Reimagined</h1>\n      <AppleMusicAuthButton />\n    </main>\n  );\n}\n"],"names":[],"mappings":";;;;;;;;;;;;AAEe,SAAS;IACtB,qBACE,8OAAC;QAAK,OAAO;YAAE,SAAS;QAAG;;0BACzB,8OAAC;0BAAG;;;;;;0BACJ,8OAAC;;;;;;;;;;;AAGP"}}]
+}

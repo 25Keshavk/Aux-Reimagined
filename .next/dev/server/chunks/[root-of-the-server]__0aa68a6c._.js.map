@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 46, "column": 0}, "map": {"version":3,"sources":["file:///Users/keshuk/Desktop/Aux-Reimagined/app/api/rooms/route.ts"],"sourcesContent":["import { NextResponse } from \"next/server\";\nimport { createRoom } from \"@/lib/rooms\";\n\nexport const runtime = \"nodejs\";\n\nexport async function POST() {\n  const room = createRoom();\n  return NextResponse.json({ roomId: room.id });\n}\n"],"names":[],"mappings":";;;;;;AAAA;;;;;;;;AAGO,MAAM,UAAU;AAEhB,eAAe;IACpB,MAAM,OAAO;IACb,OAAO,gJAAY,CAAC,IAAI,CAAC;QAAE,QAAQ,KAAK,EAAE;IAAC;AAC7C"}}]
+}

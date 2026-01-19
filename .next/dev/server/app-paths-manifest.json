@@ -1,0 +1,11 @@
+{
+  "/api/apple-music/developer-token/route": "app/api/apple-music/developer-token/route.js",
+  "/api/apple-music/search/route": "app/api/apple-music/search/route.js",
+  "/api/rooms/[roomId]/add/route": "app/api/rooms/[roomId]/add/route.js",
+  "/api/rooms/[roomId]/events/route": "app/api/rooms/[roomId]/events/route.js",
+  "/api/rooms/[roomId]/mode/route": "app/api/rooms/[roomId]/mode/route.js",
+  "/api/rooms/[roomId]/next/route": "app/api/rooms/[roomId]/next/route.js",
+  "/api/rooms/route": "app/api/rooms/route.js",
+  "/page": "app/page.js",
+  "/room/[roomId]/page": "app/room/[roomId]/page.js"
+}

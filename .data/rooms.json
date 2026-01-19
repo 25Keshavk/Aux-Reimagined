@@ -1,0 +1,280 @@
+{
+  "788448": {
+    "id": "788448",
+    "createdAt": 1768797774281,
+    "queue": []
+  },
+  "CXF2LV": {
+    "id": "CXF2LV",
+    "createdAt": 1768794121901,
+    "queue": []
+  },
+  "FVV9PL": {
+    "id": "FVV9PL",
+    "createdAt": 1768794538038,
+    "queue": []
+  },
+  "2H7VF9": {
+    "id": "2H7VF9",
+    "createdAt": 1768794632082,
+    "queue": []
+  },
+  "KWURWU": {
+    "id": "KWURWU",
+    "createdAt": 1768794643922,
+    "queue": []
+  },
+  "MZZU2D": {
+    "id": "MZZU2D",
+    "createdAt": 1768794700485,
+    "queue": []
+  },
+  "U8CACL": {
+    "id": "U8CACL",
+    "createdAt": 1768794899702,
+    "queue": []
+  },
+  "LLPMXT": {
+    "id": "LLPMXT",
+    "createdAt": 1768794995922,
+    "queue": []
+  },
+  "BS62DL": {
+    "id": "BS62DL",
+    "createdAt": 1768795057110,
+    "queue": []
+  },
+  "P2PF2R": {
+    "id": "P2PF2R",
+    "createdAt": 1768795080186,
+    "queue": []
+  },
+  "Q9SD79": {
+    "id": "Q9SD79",
+    "createdAt": 1768795573757,
+    "queue": [
+      {
+        "id": "1440642743",
+        "name": "Marvins Room",
+        "artist": "Drake",
+        "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/74/fb/d3/74fbd365-bd52-23b4-604b-7f164407b0a9/00602527899107.rgb.jpg/128x128bb.jpg",
+        "votes": 2,
+        "addedAt": 1768795607259
+      },
+      {
+        "id": "1440829630",
+        "name": "Hold On, We're Going Home (feat. Majid Jordan)",
+        "artist": "Drake",
+        "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/51/61/f3/5161f3c4-2292-f035-eb68-6f95bbc9edd6/00602537542338.rgb.jpg/128x128bb.jpg",
+        "votes": 2,
+        "addedAt": 1768795610020
+      },
+      {
+        "id": "1792003843",
+        "name": "Made Sum Plans",
+        "artist": "OsamaSon",
+        "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/4f/ef/21/4fef2189-3111-d194-2948-8963b52d41be/075679621535.jpg/128x128bb.jpg",
+        "votes": -21,
+        "addedAt": 1768795618584
+      },
+      {
+        "id": "1714908987",
+        "name": "Wicked Games",
+        "artist": "The Weeknd",
+        "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/66/d5/13/66d513dd-3cb0-b86b-4d11-1fbab2e6a639/12UMGIM54989.rgb.jpg/128x128bb.jpg",
+        "votes": 2,
+        "addedAt": 1768795685006
+      },
+      {
+        "id": "1770380890",
+        "name": "Timeless",
+        "artist": "The Weeknd & Playboi Carti",
+        "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/40/77/cb/4077cbd1-b6a0-d8df-b9d3-e9a339dbc0ea/24UM1IM04061.rgb.jpg/128x128bb.jpg",
+        "votes": 2,
+        "addedAt": 1768795686240
+      }
+    ]
+  },
+  "E284G8": {
+    "id": "E284G8",
+    "createdAt": 1768796792879,
+    "queue": [],
+    "nowPlaying": {
+      "id": "1770380890",
+      "name": "Timeless",
+      "artist": "The Weeknd & Playboi Carti",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/40/77/cb/4077cbd1-b6a0-d8df-b9d3-e9a339dbc0ea/24UM1IM04061.rgb.jpg/128x128bb.jpg",
+      "votes": 0,
+      "addedAt": 1768796846657
+    }
+  },
+  "SW4M42": {
+    "id": "SW4M42",
+    "createdAt": 1768796870456,
+    "queue": []
+  },
+  "8X3BC6": {
+    "id": "8X3BC6",
+    "createdAt": 1768796999796,
+    "queue": [],
+    "nowPlaying": {
+      "id": "1440642731",
+      "name": "Headlines",
+      "artist": "Drake",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/74/fb/d3/74fbd365-bd52-23b4-604b-7f164407b0a9/00602527899107.rgb.jpg/128x128bb.jpg",
+      "votes": -8,
+      "addedAt": 1768797034636
+    }
+  },
+  "QTBUPR": {
+    "id": "QTBUPR",
+    "createdAt": 1768797236629,
+    "queue": [
+      {
+        "id": "1440642731",
+        "name": "Headlines",
+        "artist": "Drake",
+        "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/74/fb/d3/74fbd365-bd52-23b4-604b-7f164407b0a9/00602527899107.rgb.jpg/128x128bb.jpg",
+        "votes": 8,
+        "addedAt": 1768797260420
+      },
+      {
+        "id": "1753407895",
+        "name": "Headlines (feat. Saintwick)",
+        "artist": "LuhJ5",
+        "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ba/4c/7b/ba4c7b1f-9329-4995-885b-372a0a04ae89/artwork.jpg/128x128bb.jpg",
+        "votes": 0,
+        "addedAt": 1768797281136
+      }
+    ]
+  },
+  "CUP7Q4": {
+    "id": "CUP7Q4",
+    "createdAt": 1768797303423,
+    "queue": [
+      {
+        "id": "1440642731",
+        "name": "Headlines",
+        "artist": "Drake",
+        "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/74/fb/d3/74fbd365-bd52-23b4-604b-7f164407b0a9/00602527899107.rgb.jpg/128x128bb.jpg",
+        "votes": 2,
+        "addedAt": 1768797309110
+      },
+      {
+        "id": "1440642743",
+        "name": "Marvins Room",
+        "artist": "Drake",
+        "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/74/fb/d3/74fbd365-bd52-23b4-604b-7f164407b0a9/00602527899107.rgb.jpg/128x128bb.jpg",
+        "votes": 0,
+        "addedAt": 1768797309482
+      },
+      {
+        "id": "1440891494",
+        "name": "Passionfruit",
+        "artist": "Drake",
+        "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/71/97/d0/7197d021-de0f-9548-3f31-40b8294d3242/17UMGIM85032.rgb.jpg/128x128bb.jpg",
+        "votes": 0,
+        "addedAt": 1768797310035
+      }
+    ],
+    "nowPlaying": {
+      "id": "1452017954",
+      "name": "Best I Ever Had",
+      "artist": "Drake",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/7e/b0/35/7eb0353b-8f25-32dd-5f5e-71d9ed700247/00602577524004.rgb.jpg/128x128bb.jpg",
+      "votes": 5,
+      "addedAt": 1768797309109
+    }
+  },
+  "HS2A23": {
+    "id": "HS2A23",
+    "createdAt": 1768797376498,
+    "queue": [],
+    "nowPlaying": {
+      "id": "1440642731",
+      "name": "Headlines",
+      "artist": "Drake",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/74/fb/d3/74fbd365-bd52-23b4-604b-7f164407b0a9/00602527899107.rgb.jpg/128x128bb.jpg",
+      "votes": 0,
+      "addedAt": 1768797382709
+    }
+  },
+  "JUP465": {
+    "id": "JUP465",
+    "createdAt": 1768797571376,
+    "queue": []
+  },
+  "XKE2FD": {
+    "id": "XKE2FD",
+    "createdAt": 1768797601937,
+    "queue": [],
+    "nowPlaying": {
+      "id": "1440642731",
+      "name": "Headlines",
+      "artist": "Drake",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/74/fb/d3/74fbd365-bd52-23b4-604b-7f164407b0a9/00602527899107.rgb.jpg/128x128bb.jpg",
+      "votes": 0,
+      "addedAt": 1768797607756
+    }
+  },
+  "W5YM6M": {
+    "id": "W5YM6M",
+    "createdAt": 1768797629742,
+    "queue": []
+  },
+  "V4MGP2": {
+    "id": "V4MGP2",
+    "createdAt": 1768797699975,
+    "queue": []
+  },
+  "2PAY7N": {
+    "id": "2PAY7N",
+    "createdAt": 1768797759265,
+    "queue": []
+  },
+  "CVEK9W": {
+    "id": "CVEK9W",
+    "createdAt": 1768797833926,
+    "queue": [
+      {
+        "id": "1440642731",
+        "name": "Headlines",
+        "artist": "Drake",
+        "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/74/fb/d3/74fbd365-bd52-23b4-604b-7f164407b0a9/00602527899107.rgb.jpg/128x128bb.jpg",
+        "votes": 0,
+        "addedAt": 1768797840004
+      }
+    ],
+    "nowPlaying": {
+      "id": "1452017954",
+      "name": "Best I Ever Had",
+      "artist": "Drake",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/7e/b0/35/7eb0353b-8f25-32dd-5f5e-71d9ed700247/00602577524004.rgb.jpg/128x128bb.jpg",
+      "votes": 0,
+      "addedAt": 1768797839884
+    }
+  },
+  "AKVHH4": {
+    "id": "AKVHH4",
+    "createdAt": 1768797868920,
+    "queue": []
+  },
+  "QU227C": {
+    "id": "QU227C",
+    "createdAt": 1768798026938,
+    "queue": [],
+    "nowPlaying": {
+      "id": "1452017954",
+      "name": "Best I Ever Had",
+      "artist": "Drake",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/7e/b0/35/7eb0353b-8f25-32dd-5f5e-71d9ed700247/00602577524004.rgb.jpg/128x128bb.jpg",
+      "votes": 0,
+      "addedAt": 1768798042649
+    }
+  },
+  "WLXWDJ": {
+    "id": "WLXWDJ",
+    "createdAt": 1768798439968,
+    "queue": []
+  }
+}
