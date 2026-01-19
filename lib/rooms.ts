@@ -58,7 +58,7 @@ export async function getHostKey(roomId: string): Promise<string | null> {
   const redis = await getRedis();
   const v = await redis.hGet(kMeta(roomId), "hostKey");
   if (v == null) return null;
-  return (typeof v === "string" ? v : v.toString("utf8"));
+  return typeof v === "string" ? v : Buffer.isBuffer(v) ? v.toString("utf8") : String(v);
 }
 
 export async function requireHost(roomId: string, hostKey: string | null) {
