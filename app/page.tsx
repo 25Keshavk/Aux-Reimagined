@@ -127,19 +127,23 @@ export default function Home() {
         .codeInput {
           width: 100%;
           background: transparent;
-          border: 1px solid rgba(255,255,255,0.22);
+          border: 2px solid rgba(255,255,255,0.38);
+          box-shadow: inset 0 0 0 1px rgba(0,0,0,0.35);
           color: #e6edf3;
           padding: 12px 14px;
           border-radius: 14px;
           outline: none;
           transition: border-color 120ms ease, box-shadow 120ms ease;
         }
+        .codeInput:hover {
+          border-color: rgba(255,255,255,0.52);
+        }
         .codeInput::placeholder {
           color: rgba(230,237,243,0.48);
         }
         .codeInput:focus {
-          border-color: rgba(31, 111, 235, 0.75);
-          box-shadow: 0 0 0 4px rgba(31, 111, 235, 0.18);
+          border-color: rgba(31, 111, 235, 0.95);
+          box-shadow: 0 0 0 5px rgba(31, 111, 235, 0.22), inset 0 0 0 1px rgba(0,0,0,0.35);
         }
 
         .btn {
