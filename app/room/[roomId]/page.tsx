@@ -53,6 +53,7 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
 
   // playback UI state (host only)
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isAuthed, setIsAuthed] = useState(false);
 
   useEffect(() => {
     setClientId(getOrMakeClientId());
@@ -99,6 +100,7 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
       app: { name: "Aux Reimagined", build: "1.0.0" },
     });
     setMkReady(true);
+    try { setIsAuthed(!!window.MusicKit.getInstance().isAuthorized); } catch {}
   }
 
   async function connectAppleMusic() {
@@ -270,8 +272,8 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
         </div>
 
         <div className="controls">
-          <button className="btn" disabled={!mkReady} onClick={connectAppleMusic}>
-            Connect Apple Music
+          <button className="btn" disabled={!mkReady || isAuthed} onClick={connectAppleMusic}>
+            {isAuthed ? "Apple Music Connected" : "Connect Apple Music"}
           </button>
 
           <button className="btn" disabled={!isHost} onClick={playNextOrSkip}>
