@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import Script from "next/script";
 
 type Track = {
@@ -42,6 +43,7 @@ function getOrMakeClientId() {
 }
 
 export default function RoomPage(props: { params: Promise<{ roomId: string }> }) {
+  const router = useRouter();
   const { roomId: raw } = use(props.params);
   const roomId = useMemo(() => (raw ?? "").toUpperCase(), [raw]);
 
@@ -268,6 +270,7 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
         <div className="topRow">
           <div className="pill">Room</div>
           <div className="roomCode">{roomId}</div>
+          <button className="btn homeBtn" onClick={() => router.push("/")}>Home</button>
           <button className="btn copyBtn" onClick={copyInvite}>Copy invite</button>
         </div>
 
@@ -296,7 +299,7 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
 
       <div className="twoCol">
         <section className="panel">
-          <h3 className="panelTitle">Search</h3>
+          <h3 className="panelTitle">Add songs</h3>
 
           <div className="searchBar">
             <input
@@ -536,6 +539,9 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
         .copyBtn:hover { background: rgba(0,0,0,0.62); }
 
 
+
+        .homeBtn { background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.14); }
+        .homeBtn:hover { background: rgba(255,255,255,0.16); }
         .controlBtn {
           background: rgba(0,0,0,0.55);
           border: 1px solid rgba(255,255,255,0.18);
