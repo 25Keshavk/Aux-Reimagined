@@ -29,9 +29,7 @@ export default function Home() {
     <div className="wrap">
       <div className="hero">
         <h1 className="title">Make a shared queue.</h1>
-        <p className="subtitle">
-          Create a room, share the link, and add songs together.
-        </p>
+        <p className="subtitle">Create a room, share the link, and add songs together.</p>
 
         <div className="card">
           <div className="section">
@@ -45,22 +43,24 @@ export default function Home() {
 
           <div className="section">
             <div className="label">Join a room</div>
+
             <div className="joinRow">
-              <div className="inputWrap">
-                <input
-                  value={join}
-                  onChange={(e) => setJoin(e.target.value)}
-                  placeholder="Room code (e.g. Q7K2P9)"
-                  onKeyDown={(e) => { if (e.key === "Enter") goJoin(); }}
-                />
-              </div>
+              <input
+                className="codeInput"
+                value={join}
+                onChange={(e) => setJoin(e.target.value)}
+                placeholder="Room code (e.g. Q7K2P9)"
+                onKeyDown={(e) => { if (e.key === "Enter") goJoin(); }}
+                autoCapitalize="characters"
+                autoCorrect="off"
+                spellCheck={false}
+              />
               <button className="btn secondary" onClick={goJoin} disabled={!joinCode}>
                 Join
               </button>
             </div>
-            <div className="hint">
-              Tip: after creating a room, use “Copy invite” to share it.
-            </div>
+
+            <div className="hint">Tip: after creating a room, use “Copy invite” to share it.</div>
           </div>
         </div>
       </div>
@@ -123,29 +123,23 @@ export default function Home() {
           background: rgba(255,255,255,0.10);
         }
 
-        .inputWrap {
-          position: relative;
-        }
-
-        input {
+        /* Transparent outlined input */
+        .codeInput {
           width: 100%;
-          background: rgba(0,0,0,0.60);
-          border: 1px solid rgba(255,255,255,0.16);
+          background: transparent;
+          border: 1px solid rgba(255,255,255,0.22);
           color: #e6edf3;
           padding: 12px 14px;
           border-radius: 14px;
           outline: none;
-          transition: border-color 120ms ease, box-shadow 120ms ease, background 120ms ease;
+          transition: border-color 120ms ease, box-shadow 120ms ease;
         }
-
-        input::placeholder {
-          color: rgba(230,237,243,0.50);
+        .codeInput::placeholder {
+          color: rgba(230,237,243,0.48);
         }
-
-        input:focus {
-          border-color: rgba(31, 111, 235, 0.65);
+        .codeInput:focus {
+          border-color: rgba(31, 111, 235, 0.75);
           box-shadow: 0 0 0 4px rgba(31, 111, 235, 0.18);
-          background: rgba(0,0,0,0.68);
         }
 
         .btn {
@@ -156,19 +150,16 @@ export default function Home() {
           font-weight: 800;
           white-space: nowrap;
         }
-
         .btn.primary {
           background: #1f6feb;
           color: white;
         }
-
         .btn.secondary {
           background: rgba(255,255,255,0.10);
           border: 1px solid rgba(255,255,255,0.14);
           color: #e6edf3;
           font-weight: 750;
         }
-
         .btn:disabled {
           opacity: 0.45;
           cursor: not-allowed;
