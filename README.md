@@ -1,7 +1,7 @@
 # Aux Reimagined
 
 What is Aux Reimagined?
-Aux Reimagined is a full-stack web app that lets friends build a shared party queue. One person creates a room and becomes the host. Friends can join the room, search the Apple Music catalog, add songs to the queue, and vote songs up/down in real time. The app toggles between two modes of voting and shuffling. Only the host controls playback actions like play next/skip/pause
+Aux Reimagined is a full-stack web app that lets friends build a shared party queue. One person creates a room and becomes the host. Friends can join the room, search the Apple Music catalog, add songs to the queue, and vote songs up/down in real time. The app toggles between two modes of voting and shuffling. Only the host controls playback actions like play next/skip/pause.
 
 Features included
 Frontend
