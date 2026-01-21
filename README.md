@@ -5,6 +5,10 @@ Aux Reimagined is a full-stack web app that lets friends build a shared party qu
 
 How is it different?
 Aux Reimagined solves two major problems involving any shared queue. Programs like spotify jam and shareplay require all users to have a paid subscription. By coordinating with the hosts device, everyone can queue songs without a subscription as long as the host has a paid subscription. Next, to ensure the best vibes possible, theres a voting system in the queue. Each user can upvote or downvote songs so that the most heavily liked songs in the queue play first, and highly downvoted songs will be pushed to the back of the queue (newly added songs will play before a net downvoted song). Save the wallet and the vibes with Aux Reimagined.
+
+Notes:
+Spotify integration to come soon, currently api access to spotify is restricted </3
+
 Features included
 Frontend
 - Component-based UI (Home page + Room page + song/queue cards)
