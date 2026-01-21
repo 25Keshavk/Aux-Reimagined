@@ -34,14 +34,10 @@ Full-stack
 Time spent
 Approx. 7 hours total.
 
-How to run the project
-Live deployment: aux-reimagined.vercel.app
+Run the project
+live deployment: aux-reimagined.vercel.app
 
-Prereqs
-- Node.js
-- npm
-- A Redis database 
-- Apple Developer account with MusicKit enabled + a MusicKit key 
+ 
 
 
 
