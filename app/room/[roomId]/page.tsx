@@ -82,11 +82,9 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
       const playing = ps === mk.PlaybackStates?.playing;
       setIsPlaying(!!playing);
     } catch {
-      // ignore
     }
   }
 
-  // Poll playback state every second so Pause/Resume label stays correct
   useEffect(() => {
     if (!mkReady) return;
     syncPlaybackState();
