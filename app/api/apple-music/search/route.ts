@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ results: { songs: { data: [] } } });
   }
 
-  const origin = process.env.APPLE_MUSIC_ORIGIN; // e.g. http://localhost:3000
+  const origin = process.env.APPLE_MUSIC_ORIGIN;
 
   const dtRes = await fetch(new URL("/api/apple-music/developer-token", req.url), { cache: "no-store" });
   const { token: developerToken } = await dtRes.json();
