@@ -16,6 +16,7 @@ export type Room = {
   mode: "voted" | "shuffle";
   queue: Track[];
   nowPlaying?: Track;
+  storefront?: string;
 };
 
 function kMeta(id: string) { return `aux:room:${id}:meta`; }
@@ -75,6 +76,9 @@ export async function getRoom(roomId: string): Promise<Room | null> {
   const createdAt = Number((typeof meta.createdAt === "string" ? meta.createdAt : (meta.createdAt ? meta.createdAt.toString("utf8") : "0")) || 0);
   const modeStr = typeof meta.mode === "string" ? meta.mode : (meta.mode ? meta.mode.toString("utf8") : "voted");
   const mode = (modeStr === "shuffle" ? "shuffle" : "voted") as "voted" | "shuffle";
+  const storefront = typeof meta.storefront === "string"
+    ? meta.storefront
+    : (meta.storefront ? meta.storefront.toString("utf8") : "");
 
   let nowPlaying: Track | undefined = undefined;
   const np = (typeof meta.nowPlayingJson === "string" ? meta.nowPlayingJson : (meta.nowPlayingJson ? meta.nowPlayingJson.toString("utf8") : "")) || "";
@@ -84,7 +88,7 @@ export async function getRoom(roomId: string): Promise<Room | null> {
 
   const trackIdsRaw = await redis.sMembers(kQueue(roomId));
   const trackIds = (Array.isArray(trackIdsRaw) ? trackIdsRaw : Array.from(trackIdsRaw as any)).map((x: any) => typeof x === "string" ? x : x.toString("utf8")) as string[];
-  if (trackIds.length === 0) return { id: roomId, createdAt, mode, queue: [], nowPlaying };
+  if (trackIds.length === 0) return { id: roomId, createdAt, mode, queue: [], nowPlaying, storefront: storefront || undefined };
 
   const pipe = redis.multi();
   for (const tid of trackIds) {
@@ -120,7 +124,7 @@ export async function getRoom(roomId: string): Promise<Room | null> {
   }
 
   queue.sort((a, b) => (b.votes - a.votes) || (a.addedAt - b.addedAt));
-  return { id: roomId, createdAt, mode, queue, nowPlaying };
+  return { id: roomId, createdAt, mode, queue, nowPlaying, storefront: storefront || undefined };
 }
 
 export async function addTrack(roomId: string, t: { id: string; name: string; artist: string; artworkUrl?: string }): Promise<Room> {
@@ -183,6 +187,16 @@ export async function setMode(roomId: string, mode: "voted" | "shuffle", hostKey
   await requireHost(roomId, hostKey);
   const redis = await getRedis();
   await redis.hSet(kMeta(roomId), { mode });
+
+  const room = await getRoom(roomId);
+  if (!room) throw new Error("Room not found");
+  return room;
+}
+
+export async function setStorefront(roomId: string, storefront: string, hostKey: string | null): Promise<Room> {
+  await requireHost(roomId, hostKey);
+  const redis = await getRedis();
+  await redis.hSet(kMeta(roomId), { storefront });
 
   const room = await getRoom(roomId);
   if (!room) throw new Error("Room not found");

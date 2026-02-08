@@ -20,6 +20,7 @@ type RoomState = {
   queue: Track[];
   nowPlaying?: Track;
   isHost: boolean;
+  storefront?: string;
 };
 
 declare global {
@@ -73,6 +74,7 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
   // playback UI state (host only)
   const [isPlaying, setIsPlaying] = useState(false);
   const [isAuthed, setIsAuthed] = useState(false);
+  const [sfSaved, setSfSaved] = useState(false);
 
   useEffect(() => {
     setClientId(getOrMakeClientId());
@@ -97,6 +99,11 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
     };
     return () => es.close();
   }, [roomId]);
+
+  useEffect(() => {
+    if (!mkReady || !isHost) return;
+    updateStorefrontIfHost();
+  }, [mkReady, isHost]);
 
   function syncPlaybackState() {
     try {
@@ -139,11 +146,23 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
     return { mk, music };
   }
 
+  async function waitForPlaybackStart(mk: any, music: any, timeoutMs = 3500) {
+    const start = Date.now();
+    while (Date.now() - start < timeoutMs) {
+      const ps = music?.player?.playbackState;
+      if (ps === mk.PlaybackStates?.playing) return true;
+      await new Promise((r) => setTimeout(r, 200));
+    }
+    return false;
+  }
+
   async function playTrackById(trackId: string, contextLabel: string) {
     try {
-      const { music } = await ensureAuthorized();
+      const { mk, music } = await ensureAuthorized();
       await music.setQueue({ song: trackId });
       await music.play();
+      const ok = await waitForPlaybackStart(mk, music);
+      if (!ok) throw new Error("Playback did not start. Song may be unavailable for this account/region.");
       syncPlaybackState();
     } catch (e) {
       console.error(e);
@@ -152,10 +171,30 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
     }
   }
 
+  async function updateStorefrontIfHost() {
+    if (!isHost || sfSaved) return;
+    try {
+      const mk = window.MusicKit;
+      if (!mk) return;
+      const music = mk.getInstance();
+      if (!music?.isAuthorized) return;
+      const sf = (music.storefrontId || music.api?.storefrontId || "").toString().toLowerCase();
+      if (!sf) return;
+
+      const res = await fetch(`/api/rooms/${roomId}/storefront`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ storefront: sf }),
+      });
+      if (res.ok) setSfSaved(true);
+    } catch {}
+  }
+
   async function connectAppleMusic() {
     try {
       await ensureAuthorized();
       syncPlaybackState();
+      updateStorefrontIfHost();
     } catch (e) {
       console.error(e);
       alert(`Authorization failed. ${formatErr(e)}`);
@@ -187,12 +226,15 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
   async function search() {
     const term = q.trim();
     if (!term) return;
+    const sf = (room?.storefront ?? "us").toLowerCase();
     const res = await fetch(
-      `/api/apple-music/search?q=${encodeURIComponent(term)}&storefront=us`,
+      `/api/apple-music/search?q=${encodeURIComponent(term)}&storefront=${encodeURIComponent(sf)}`,
       { cache: "no-store" }
     );
     const json = await res.json();
-    setResults(json?.results?.songs?.data ?? []);
+    const songs = json?.results?.songs?.data ?? [];
+    const playable = songs.filter((item: any) => item?.attributes?.playParams?.id);
+    setResults(playable);
   }
 
   async function addSong(item: any) {
