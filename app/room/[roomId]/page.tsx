@@ -28,18 +28,27 @@ declare global {
   }
 }
 
+let fallbackClientId = "";
+
+function makeClientId() {
+  return (globalThis.crypto && "randomUUID" in globalThis.crypto)
+    ? globalThis.crypto.randomUUID()
+    : `${Date.now()}_${Math.random().toString(16).slice(2)}`;
+}
+
 function getOrMakeClientId() {
   const k = "aux_client_id";
-  const existing = localStorage.getItem(k);
-  if (existing) return existing;
+  try {
+    const existing = localStorage.getItem(k);
+    if (existing) return existing;
 
-  const id =
-    (globalThis.crypto && "randomUUID" in globalThis.crypto)
-      ? globalThis.crypto.randomUUID()
-      : `${Date.now()}_${Math.random().toString(16).slice(2)}`;
-
-  localStorage.setItem(k, id);
-  return id;
+    const id = makeClientId();
+    localStorage.setItem(k, id);
+    return id;
+  } catch {
+    if (!fallbackClientId) fallbackClientId = makeClientId();
+    return fallbackClientId;
+  }
 }
 
 export default function RoomPage(props: { params: Promise<{ roomId: string }> }) {
@@ -48,6 +57,7 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
   const roomId = useMemo(() => (raw ?? "").toUpperCase(), [raw]);
 
   const [room, setRoom] = useState<RoomState | null>(null);
+  const [roomStatus, setRoomStatus] = useState<"loading" | "ready" | "notFound">("loading");
   const [q, setQ] = useState("");
   const [results, setResults] = useState<any[]>([]);
   const [mkReady, setMkReady] = useState(false);
@@ -63,11 +73,19 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
 
   useEffect(() => {
     if (!roomId) return;
+    setRoom(null);
+    setRoomStatus("loading");
     const es = new EventSource(`/api/rooms/${roomId}/events`);
     es.onmessage = (evt) => {
       try {
         const data = JSON.parse(evt.data);
-        if (!data?.error) setRoom(data);
+        if (data?.error) {
+          setRoom(null);
+          setRoomStatus("notFound");
+          return;
+        }
+        setRoom(data);
+        setRoomStatus("ready");
       } catch {}
     };
     return () => es.close();
@@ -106,6 +124,7 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
   async function connectAppleMusic() {
     const music = window.MusicKit.getInstance();
     await music.authorize();
+    setIsAuthed(true);
     syncPlaybackState();
   }
 
@@ -139,7 +158,10 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
   }
 
   async function addSong(item: any) {
-    if (!clientId) return;
+    if (!clientId) {
+      alert("Still initializing your session. Please try again.");
+      return;
+    }
 
     const attr = item.attributes;
     const artwork = attr?.artwork?.url
@@ -167,7 +189,10 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
   }
 
   async function vote(trackId: string, delta: 1 | -1) {
-    if (!clientId) return;
+    if (!clientId) {
+      alert("Still initializing your session. Please try again.");
+      return;
+    }
 
     const res = await fetch(`/api/rooms/${roomId}/vote`, {
       method: "POST",
@@ -188,6 +213,11 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
     const res = await fetch(`/api/rooms/${roomId}/next`, { method: "POST" });
     if (res.status === 403) {
       alert("Only the room creator can skip/play next.");
+      return;
+    }
+    if (!res.ok) {
+      const txt = await res.text();
+      alert(`Play next failed (${res.status}).\n${txt}`);
       return;
     }
     const json = await res.json();
@@ -254,7 +284,7 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
     }
   }
 
-  const isHost = !!room?.isHost;
+  const isHost = roomStatus === "ready" && !!room?.isHost;
 
   return (
     <div>
@@ -290,11 +320,14 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
           </button>
         </div>
 
-        {!isHost ? (
+        {roomStatus === "notFound" ? (
+          <div className="hint error">Room not found. Check the code or ask for a new invite.</div>
+        ) : !isHost ? (
           <div className="hint">Only the creator can control playback and moderation.</div>
         ) : null}
       </div>
 
+      {roomStatus === "notFound" ? null : (
       <div className="twoCol">
         <section className="panel">
           <h3 className="panelTitle">Add songs</h3>
@@ -402,6 +435,7 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
           </div>
         </aside>
       </div>
+      )}
 
       <style jsx>{`
         .topCard {
@@ -436,6 +470,7 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
           opacity: 0.7;
           font-size: 13px;
         }
+        .hint.error { color: #f85149; opacity: 0.95; }
 
         .twoCol {
           display: grid;

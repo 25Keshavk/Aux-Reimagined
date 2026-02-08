@@ -20,9 +20,18 @@ export default function Home() {
     router.push(`/room/${roomId}`);
   }
 
-  function goJoin() {
+  async function goJoin() {
     if (!joinCode) return;
-    router.push(`/room/${joinCode}`);
+    try {
+      const res = await fetch(`/api/rooms/${joinCode}`, { cache: "no-store" });
+      if (!res.ok) {
+        alert("Room not found. Double-check the code.");
+        return;
+      }
+      router.push(`/room/${joinCode}`);
+    } catch {
+      alert("Could not verify room. Try again.");
+    }
   }
 
   return (
