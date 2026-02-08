@@ -76,6 +76,8 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
   const [isAuthed, setIsAuthed] = useState(false);
   const [sfSaved, setSfSaved] = useState(false);
 
+  const isHost = roomStatus === "ready" && !!room?.isHost;
+
   useEffect(() => {
     setClientId(getOrMakeClientId());
   }, []);
@@ -370,7 +372,6 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
     }
   }
 
-  const isHost = roomStatus === "ready" && !!room?.isHost;
   const visibleQueue = (room?.queue ?? []).filter((t) => t.id !== room?.nowPlaying?.id);
 
   return (
