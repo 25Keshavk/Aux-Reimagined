@@ -191,6 +191,7 @@ export async function setMode(roomId: string, mode: "voted" | "shuffle", hostKey
 
 export async function nextTrack(roomId: string, hostKey: string | null): Promise<{ room: Room; next: Track | null }> {
   await requireHost(roomId, hostKey);
+  const redis = await getRedis();
 
   const room = await getRoom(roomId);
   if (!room) throw new Error("Room not found");
