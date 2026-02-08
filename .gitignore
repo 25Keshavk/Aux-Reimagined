@@ -8,6 +8,7 @@ out
 # env
 .env.local
 .env.*.local
+AuthKey_*.p8
 
 # logs
 npm-debug.log*
