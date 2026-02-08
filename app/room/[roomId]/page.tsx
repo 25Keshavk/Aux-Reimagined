@@ -268,6 +268,15 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
 
     try {
       await playTrackById(next.id, "Playback");
+      const confirm = await fetch(`/api/rooms/${roomId}/played`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ trackId: next.id }),
+      });
+      if (!confirm.ok) {
+        const txt = await confirm.text();
+        console.warn("Failed to confirm played:", confirm.status, txt);
+      }
     } catch (e) {
       console.error(e);
       alert("Playback failed. The song may be unavailable for your account/region. Try skipping again.");
@@ -320,6 +329,7 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
   }
 
   const isHost = roomStatus === "ready" && !!room?.isHost;
+  const visibleQueue = (room?.queue ?? []).filter((t) => t.id !== room?.nowPlaying?.id);
 
   return (
     <div>
@@ -433,14 +443,14 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
 
           <div className="queueHeader">
             <h3 className="panelTitle" style={{ margin: 0 }}>Queue</h3>
-            <div className="mutedSmall">{room?.queue?.length ?? 0} songs</div>
+            <div className="mutedSmall">{visibleQueue.length} songs</div>
           </div>
 
           <div className="queue">
-            {(room?.queue ?? []).length === 0 ? (
+            {visibleQueue.length === 0 ? (
               <div className="muted">Queue is empty.</div>
             ) : (
-              (room?.queue ?? []).map((t) => (
+              visibleQueue.map((t) => (
                 <div key={t.id} className="queueRow">
                   {t.artworkUrl ? (
                     <img className="art" src={t.artworkUrl} width={56} height={56} alt="" />

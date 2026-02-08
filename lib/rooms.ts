@@ -191,7 +191,6 @@ export async function setMode(roomId: string, mode: "voted" | "shuffle", hostKey
 
 export async function nextTrack(roomId: string, hostKey: string | null): Promise<{ room: Room; next: Track | null }> {
   await requireHost(roomId, hostKey);
-  const redis = await getRedis();
 
   const room = await getRoom(roomId);
   if (!room) throw new Error("Room not found");
@@ -200,32 +199,13 @@ export async function nextTrack(roomId: string, hostKey: string | null): Promise
   let next: Track | null = null;
 
   if (room.mode === "shuffle") {
-    const tid = await redis.sRandMember(kQueue(roomId));
-    if (!tid) return { room, next: null };
-
-    const tidStr = typeof tid === "string" ? tid : (tid as any).toString("utf8");
-
-    const json = await redis.hGet(kTracks(roomId), tidStr);
-    const addedAtStr = await redis.hGet(kAdded(roomId), tidStr);
-    const upRaw = await redis.sCard(kUp(roomId, tidStr));
-    const up = typeof upRaw === "string" ? parseInt(upRaw, 10) : Number(upRaw);
-    const downRaw = await redis.sCard(kDown(roomId, tidStr));
-    const down = typeof downRaw === "string" ? parseInt(downRaw, 10) : Number(downRaw);
-
-    if (json) {
-      try {
-        const jsonStr = typeof json === "string" ? json : (json as any).toString("utf8");
-        const base = JSON.parse(jsonStr) as Omit<Track, "votes" | "addedAt">;
-        next = { ...base, votes: up - down, addedAt: Number(addedAtStr ?? Date.now()) };
-      } catch {
-        next = null;
-      }
-    }
-
-    await redis.sRem(kQueue(roomId), tidStr);
+    const candidates = room.queue.filter((t) => t.id !== room.nowPlaying?.id);
+    if (candidates.length === 0) return { room, next: null };
+    next = candidates[Math.floor(Math.random() * candidates.length)];
   } else {
-    next = room.queue[0];
-    await redis.sRem(kQueue(roomId), next.id);
+    const candidates = room.queue.filter((t) => t.id !== room.nowPlaying?.id);
+    if (candidates.length === 0) return { room, next: null };
+    next = candidates[0];
   }
 
   if (!next) {
@@ -238,4 +218,19 @@ export async function nextTrack(roomId: string, hostKey: string | null): Promise
   const updated = await getRoom(roomId);
   if (!updated) throw new Error("Room not found");
   return { room: updated, next };
+}
+
+export async function confirmPlayed(roomId: string, trackId: string, hostKey: string | null): Promise<Room> {
+  await requireHost(roomId, hostKey);
+  const redis = await getRedis();
+
+  await redis.sRem(kQueue(roomId), trackId);
+  await redis.hDel(kTracks(roomId), trackId);
+  await redis.hDel(kAdded(roomId), trackId);
+  await redis.del(kUp(roomId, trackId));
+  await redis.del(kDown(roomId, trackId));
+
+  const room = await getRoom(roomId);
+  if (!room) throw new Error("Room not found");
+  return room;
 }
