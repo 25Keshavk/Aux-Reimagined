@@ -51,6 +51,13 @@ function getOrMakeClientId() {
   }
 }
 
+function formatErr(e: any) {
+  if (!e) return "Unknown error";
+  if (typeof e === "string") return e;
+  if (e?.message) return e.message;
+  try { return JSON.stringify(e); } catch { return String(e); }
+}
+
 export default function RoomPage(props: { params: Promise<{ roomId: string }> }) {
   const router = useRouter();
   const { roomId: raw } = use(props.params);
@@ -121,28 +128,59 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
     try { setIsAuthed(!!window.MusicKit.getInstance().isAuthorized); } catch {}
   }
 
+  async function ensureAuthorized() {
+    const mk = window.MusicKit;
+    if (!mk) throw new Error("MusicKit not loaded");
+    const music = mk.getInstance();
+    if (!music.isAuthorized) {
+      await music.authorize();
+    }
+    setIsAuthed(!!music.isAuthorized);
+    return { mk, music };
+  }
+
+  async function playTrackById(trackId: string, contextLabel: string) {
+    try {
+      const { music } = await ensureAuthorized();
+      await music.setQueue({ song: trackId });
+      await music.play();
+      syncPlaybackState();
+    } catch (e) {
+      console.error(e);
+      alert(`${contextLabel} failed. ${formatErr(e)}`);
+      throw e;
+    }
+  }
+
   async function connectAppleMusic() {
-    const music = window.MusicKit.getInstance();
-    await music.authorize();
-    setIsAuthed(true);
-    syncPlaybackState();
+    try {
+      await ensureAuthorized();
+      syncPlaybackState();
+    } catch (e) {
+      console.error(e);
+      alert(`Authorization failed. ${formatErr(e)}`);
+    }
   }
 
   async function togglePause() {
     try {
-      const mk = window.MusicKit;
-      if (!mk) return;
-      const music = mk.getInstance();
+      const { mk, music } = await ensureAuthorized();
       const ps = music.player.playbackState;
       const playing = ps === mk.PlaybackStates?.playing;
 
-      if (playing) await music.pause();
-      else await music.play();
+      if (playing) {
+        await music.pause();
+      } else if (ps === mk.PlaybackStates?.stopped && room?.nowPlaying?.id) {
+        await playTrackById(room.nowPlaying.id, "Resume");
+        return;
+      } else {
+        await music.play();
+      }
 
       syncPlaybackState();
     } catch (e) {
       console.error(e);
-      alert("Pause/Resume failed. Try Connect Apple Music first.");
+      alert(`Pause/Resume failed. ${formatErr(e)}`);
     }
   }
 
@@ -229,13 +267,10 @@ export default function RoomPage(props: { params: Promise<{ roomId: string }> })
     }
 
     try {
-      const music = window.MusicKit.getInstance();
-      await music.setQueue({ song: next.id });
-      await music.play();
-      syncPlaybackState();
+      await playTrackById(next.id, "Playback");
     } catch (e) {
       console.error(e);
-      alert("Playback failed. Click 'Connect Apple Music' first.");
+      alert("Playback failed. The song may be unavailable for your account/region. Try skipping again.");
     }
   }
 
